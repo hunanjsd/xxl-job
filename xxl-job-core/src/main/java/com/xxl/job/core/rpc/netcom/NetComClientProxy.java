@@ -15,6 +15,7 @@ import java.lang.reflect.Proxy;
  * rpc proxy
  * @author xuxueli 2015-10-29 20:18:32
  */
+//这个类被调度中心持有，用来rpc调用本地方法
 public class NetComClientProxy implements FactoryBean<Object> {
 	private static final Logger logger = LoggerFactory.getLogger(NetComClientProxy.class);
 
@@ -29,6 +30,7 @@ public class NetComClientProxy implements FactoryBean<Object> {
 		this.accessToken = accessToken;
 	}
 
+	//向xxl-job-admin进行Rpc通信初始化连接
 	@Override
 	public Object getObject() throws Exception {
 		return Proxy.newProxyInstance(Thread.currentThread()

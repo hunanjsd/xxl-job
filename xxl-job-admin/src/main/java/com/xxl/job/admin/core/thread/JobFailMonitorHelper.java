@@ -44,6 +44,7 @@ public class JobFailMonitorHelper {
 				while (!toStop) {
 					try {
 						List<Integer> jobLogIdList = new ArrayList<Integer>();
+						//drainTo方法将queue中所有元素添加到jobLogIdList中
 						int drainToNum = JobFailMonitorHelper.instance.queue.drainTo(jobLogIdList);
 
 						if (CollectionUtils.isNotEmpty(jobLogIdList)) {
@@ -74,7 +75,7 @@ public class JobFailMonitorHelper {
 								}*/
 							}
 						}
-
+						//10秒检测一次失败的job
 						TimeUnit.SECONDS.sleep(10);
 					} catch (Exception e) {
 						logger.error("job monitor error:{}", e);
@@ -113,6 +114,7 @@ public class JobFailMonitorHelper {
 	}
 	
 	// producer
+	//一个静态方法，往list中添加需要监控的jobId
 	public static void monitor(int jobLogId){
 		getInstance().queue.offer(jobLogId);
 	}
@@ -141,11 +143,13 @@ public class JobFailMonitorHelper {
 			"   <tbody>\n" +
 			"</table>";
 
+
 	/**
 	 * fail alarm
 	 *
 	 * @param jobLog
 	 */
+	//job执行失败邮件告警
 	private void failAlarm(XxlJobLog jobLog){
 
 		// send monitor email

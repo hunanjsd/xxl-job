@@ -42,6 +42,7 @@ public class ExecutorRouteLRU extends ExecutorRouter {
         }
 
         // put
+        //将没有使用的address机器放到最前面，若全部都有使用，这段代码什么都不做
         for (String address: addressList) {
             if (!lruItem.containsKey(address)) {
                 lruItem.put(address, address);
@@ -49,6 +50,8 @@ public class ExecutorRouteLRU extends ExecutorRouter {
         }
 
         // load
+        //使用LinkedHashMap做LRU缓存是LinkedHashMap自身支持的，每次get元素后,linkedHashMap都会把这个元素移到尾部去
+        //所以这里没有其他额外的处理
         String eldestKey = lruItem.entrySet().iterator().next().getKey();
         String eldestValue = lruItem.get(eldestKey);
         return eldestValue;

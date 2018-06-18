@@ -6,6 +6,10 @@ import java.util.Date;
  * xxl-job info
  * @author xuxueli  2016-1-12 18:25:49
  */
+
+/**
+ * 对应于数据库中XXL_JOB_QRTZ_TRIGGER_INFO表(ps:实体类类名字于数据库中表名不一致)
+ */
 public class XxlJobInfo {
 	
 	private int id;				// 主键ID	    (JobKey.name)

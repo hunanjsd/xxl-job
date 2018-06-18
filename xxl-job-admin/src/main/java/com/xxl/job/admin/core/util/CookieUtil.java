@@ -25,6 +25,7 @@ public class CookieUtil {
 	 * @param ifRemember 
 	 */
 	public static void set(HttpServletResponse response, String key, String value, boolean ifRemember) {
+		//是否记住登陆状态，如是则设置cookie保存时间为2h
 		int age = ifRemember?COOKIE_MAX_AGE:-1;
 		set(response, key, value, null, COOKIE_PATH, age, true);
 	}
@@ -37,6 +38,7 @@ public class CookieUtil {
 	 * @param value
 	 * @param maxAge
 	 */
+	//保存设置cookie
 	private static void set(HttpServletResponse response, String key, String value, String domain, String path, int maxAge, boolean isHttpOnly) {
 		Cookie cookie = new Cookie(key, value);
 		if (domain != null) {
@@ -69,6 +71,7 @@ public class CookieUtil {
 	 * @param request
 	 * @param key
 	 */
+	//根据key获取request中保存的cookie值
 	private static Cookie get(HttpServletRequest request, String key) {
 		Cookie[] arr_cookie = request.getCookies();
 		if (arr_cookie != null && arr_cookie.length > 0) {

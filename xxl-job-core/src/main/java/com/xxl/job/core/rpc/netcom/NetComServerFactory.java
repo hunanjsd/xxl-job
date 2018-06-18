@@ -16,6 +16,7 @@ import java.util.Map;
  * netcom init
  * @author xuxueli 2015-10-31 22:54:27
  */
+//执行远程Rpc调用的类
 public class NetComServerFactory  {
 	private static final Logger logger = LoggerFactory.getLogger(NetComServerFactory.class);
 
@@ -34,6 +35,7 @@ public class NetComServerFactory  {
 	/**
 	 * init local rpc service map
 	 */
+	//初始化本地server bean
 	private static Map<String, Object> serviceMap = new HashMap<String, Object>();
 	private static String accessToken;
 	public static void putService(Class<?> iface, Object serviceBean){
@@ -68,8 +70,9 @@ public class NetComServerFactory  {
 			Object[] parameters = request.getParameters();
 
 			FastClass serviceFastClass = FastClass.create(serviceClass);
+			//Rpc调用的方法和参数
 			FastMethod serviceFastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
-
+			//执行RPC调用并得到结果
 			Object result = serviceFastMethod.invoke(serviceBean, parameters);
 
 			response.setResult(result);

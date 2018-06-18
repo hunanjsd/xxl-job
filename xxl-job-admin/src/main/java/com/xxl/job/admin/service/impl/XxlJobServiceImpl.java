@@ -32,6 +32,7 @@ import java.util.*;
  * core job action for xxl-job
  * @author xuxueli 2016-5-28 15:30:33
  */
+//这个Service可以被Rpc远程调用
 @Service
 public class XxlJobServiceImpl implements XxlJobService {
 	private static Logger logger = LoggerFactory.getLogger(XxlJobServiceImpl.class);
@@ -294,11 +295,15 @@ public class XxlJobServiceImpl implements XxlJobService {
 	@Override
 	public Map<String, Object> dashboardInfo() {
 
+		//job数量
 		int jobInfoCount = xxlJobInfoDao.findAllCount();
+		//job调度次数
 		int jobLogCount = xxlJobLogDao.triggerCountByHandleCode(-1);
+		//调度成功次数
 		int jobLogSuccessCount = xxlJobLogDao.triggerCountByHandleCode(ReturnT.SUCCESS_CODE);
 
 		// executor count
+		//job执行期在线数量
 		Set<String> executerAddressSet = new HashSet<String>();
 		List<XxlJobGroup> groupList = xxlJobGroupDao.findAll();
 
@@ -339,13 +344,19 @@ public class XxlJobServiceImpl implements XxlJobService {
 		int triggerCountSucTotal = 0;
 		int triggerCountFailTotal = 0;
 
+		//根据startDate,endDate得到时间段内的job执行日志
 		List<Map<String, Object>> triggerCountMapAll = xxlJobLogDao.triggerCountByDay(startDate, endDate);
 		if (CollectionUtils.isNotEmpty(triggerCountMapAll)) {
 			for (Map<String, Object> item: triggerCountMapAll) {
+				//job触发器时间
 				String day = String.valueOf(item.get("triggerDay"));
+				//触发器执行次数
 				int triggerDayCount = Integer.valueOf(String.valueOf(item.get("triggerDayCount")));
+				//正在执行的任务数量
 				int triggerDayCountRunning = Integer.valueOf(String.valueOf(item.get("triggerDayCountRunning")));
+				//所有任务总量
 				int triggerDayCountSuc = Integer.valueOf(String.valueOf(item.get("triggerDayCountSuc")));
+				//失败的任务总量
 				int triggerDayCountFail = triggerDayCount - triggerDayCountRunning - triggerDayCountSuc;
 
 				triggerDayList.add(day);
@@ -358,6 +369,7 @@ public class XxlJobServiceImpl implements XxlJobService {
 				triggerCountFailTotal += triggerDayCountFail;
 			}
 		} else {
+			//当job_trigger_log中数据为空时，手动设置
             for (int i = 4; i > -1; i--) {
                 triggerDayList.add(FastDateFormat.getInstance("yyyy-MM-dd").format(DateUtils.addDays(new Date(), -i)));
                 triggerDayCountSucList.add(0);

@@ -11,6 +11,7 @@ import java.io.IOException;
  * hessian serialize
  * @author xuxueli 2015-9-26 02:53:29
  */
+//rpc调用时传输数据用的序列化和反序列化
 public class HessianSerializer  {
 
 	public static <T> byte[] serialize(T obj){

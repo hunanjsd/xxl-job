@@ -67,6 +67,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
 	}
 
     // ---------------------- init + destroy ----------------------
+    //开启一些系统守护线程
     public void init() throws Exception {
         // admin registry monitor run
         JobRegistryMonitorHelper.getInstance().start();
@@ -75,6 +76,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         JobFailMonitorHelper.getInstance().start();
 
         // admin-server(spring-mvc)
+        //设置xxl-job-admin的Rpc调用服务器端
         NetComServerFactory.putService(AdminBiz.class, XxlJobDynamicScheduler.adminBiz);
         NetComServerFactory.setAccessToken(accessToken);
 
@@ -196,6 +198,7 @@ public final class XxlJobDynamicScheduler implements ApplicationContextAware {
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity(triggerKey).withSchedule(cronScheduleBuilder).build();
 
         // JobDetail : jobClass
+        //所有的job都使用这个RemoteHttpJobBean.class，执行里面的executeInternal方法
 		Class<? extends Job> jobClass_ = RemoteHttpJobBean.class;   // Class.forName(jobInfo.getJobClass());
         
 		JobDetail jobDetail = JobBuilder.newJob(jobClass_).withIdentity(jobKey).build();

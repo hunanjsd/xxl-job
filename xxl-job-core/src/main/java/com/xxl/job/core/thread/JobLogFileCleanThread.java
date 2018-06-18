@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author xuxueli 2017-12-29 16:23:43
  */
+//job日志清理线程，清理的事日志文件，不是mysql中的job执行日志
 public class JobLogFileCleanThread extends Thread {
     private static Logger logger = LoggerFactory.getLogger(JobLogFileCleanThread.class);
 
@@ -30,6 +31,7 @@ public class JobLogFileCleanThread extends Thread {
     public void start(final long logRetentionDays){
 
         // limit min value
+        //日志自动清理的日期小于3天，则不清理
         if (logRetentionDays < 3 ) {
             return;
         }

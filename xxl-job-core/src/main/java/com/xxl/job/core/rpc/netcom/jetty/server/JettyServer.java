@@ -29,6 +29,7 @@ public class JettyServer {
 				server = new Server(new ExecutorThreadPool());  // 非阻塞
 
 				// HTTP connector
+				//jetty连接使用http
 				ServerConnector connector = new ServerConnector(server);
 				if (ip!=null && ip.trim().length()>0) {
 					connector.setHost(ip);	// The network interface this connector binds to as an IP address or a hostname.  If null or 0.0.0.0, then bind to all interfaces.

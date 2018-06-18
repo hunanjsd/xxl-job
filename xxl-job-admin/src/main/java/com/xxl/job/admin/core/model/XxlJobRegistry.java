@@ -5,6 +5,7 @@ import java.util.Date;
 /**
  * Created by xuxueli on 16/9/30.
  */
+//对应于XXL-JOB-QRTZ-TRIGGER-REGISTRY表
 public class XxlJobRegistry {
 
     private int id;

@@ -29,6 +29,7 @@ public class ExecutorRouteLFU extends ExecutorRouter {
         }
 
         // lfu item init
+        //为每一个job设置jobItemMap,记录该job在每个机器上的执行次数
         HashMap<String, Integer> lfuItemMap = jobLfuMap.get(jobId);     // Key排序可以用TreeMap+构造入参Compare；Value排序暂时只能通过ArrayList；
         if (lfuItemMap == null) {
             lfuItemMap = new HashMap<String, Integer>();
@@ -36,11 +37,13 @@ public class ExecutorRouteLFU extends ExecutorRouter {
         }
         for (String address: addressList) {
             if (!lfuItemMap.containsKey(address) || lfuItemMap.get(address) >1000000 ) {
+                //为什么put的是一个随机数而不是0呢？
                 lfuItemMap.put(address, new Random().nextInt(addressList.size()));  // 初始化时主动Random一次，缓解首次压力
             }
         }
 
         // load least userd count address
+        //排序jobItemMap中的值，找到在那个机器上该job执行的最少
         List<Map.Entry<String, Integer>> lfuItemList = new ArrayList<Map.Entry<String, Integer>>(lfuItemMap.entrySet());
         Collections.sort(lfuItemList, new Comparator<Map.Entry<String, Integer>>() {
             @Override
@@ -50,7 +53,8 @@ public class ExecutorRouteLFU extends ExecutorRouter {
         });
 
         Map.Entry<String, Integer> addressItem = lfuItemList.get(0);
-        String minAddress = addressItem.getKey();
+        //这...多余的语句
+      //  String minAddress = addressItem.getKey();
         addressItem.setValue(addressItem.getValue() + 1);
 
         return addressItem.getKey();

@@ -24,17 +24,20 @@ import java.util.concurrent.TimeUnit;
  * handler thread
  * @author xuxueli 2016-1-16 19:52:47
  */
+//单个job执行线程
 public class JobThread extends Thread{
 	private static Logger logger = LoggerFactory.getLogger(JobThread.class);
 
 	private int jobId;
+	//job处理的类
 	private IJobHandler handler;
+	//处理器handler中传递的参数
 	private LinkedBlockingQueue<TriggerParam> triggerQueue;
 	private Set<Integer> triggerLogIdSet;		// avoid repeat trigger for the same TRIGGER_LOG_ID
 
 	private volatile boolean toStop = false;
 	private String stopReason;
-
+	//标志这个执行器是否有job执行
     private boolean running = false;    // if running job
 	private int idleTimes = 0;			// idel times
 
@@ -113,11 +116,13 @@ public class JobThread extends Thread{
 				if (triggerParam!=null) {
 					running = true;
 					idleTimes = 0;
+					//当前任务已经被执行了，删除set中存储的触发器参数
 					triggerLogIdSet.remove(triggerParam.getLogId());
 
 					// log filename, like "logPath/yyyy-MM-dd/9999.log"
 					String logFileName = XxlJobFileAppender.makeLogFileName(new Date(triggerParam.getLogDateTim()), triggerParam.getLogId());
 					XxlJobFileAppender.contextHolder.set(logFileName);
+					//处理分片广播的情况
 					ShardingUtil.setShardingVo(new ShardingUtil.ShardingVO(triggerParam.getBroadcastIndex(), triggerParam.getBroadcastTotal()));
 
 					// execute
@@ -129,6 +134,7 @@ public class JobThread extends Thread{
 					XxlJobLogger.log("<br>----------- xxl-job job execute end(finish) -----------<br>----------- ReturnT:" + executeResult);
 
 				} else {
+					//循环30次没有执行任务，删除job线程
 					if (idleTimes > 30) {
 						XxlJobExecutor.removeJobThread(jobId, "excutor idel times over limit.");
 					}
@@ -145,6 +151,7 @@ public class JobThread extends Thread{
 
 				XxlJobLogger.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- xxl-job job execute end(error) -----------");
 			} finally {
+            	//反馈job调度结果
                 if(triggerParam != null) {
                     // callback handler info
                     if (!toStop) {

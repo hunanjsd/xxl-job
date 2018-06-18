@@ -28,6 +28,8 @@ public class ExecutorRouteBusyover extends ExecutorRouter {
             ReturnT<String> idleBeatResult = null;
             try {
                 ExecutorBiz executorBiz = XxlJobDynamicScheduler.getExecutorBiz(address);
+                //我觉得这还是有些问题的，ExecutorBiz断开后还是会返回SUCCESS,没有守护线程在ExecutorBiz断开后将其设置为null
+                //呃呃...第一遍没看懂，这是rpc服务端调用远程rpc客户端方法进行执行器空闲检测
                 idleBeatResult = executorBiz.idleBeat(triggerParam.getJobId());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);

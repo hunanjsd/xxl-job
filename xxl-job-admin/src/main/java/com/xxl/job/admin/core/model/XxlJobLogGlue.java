@@ -4,6 +4,10 @@ package com.xxl.job.admin.core.model;
  * xxl-job log for glue, used to track job code process
  * @author xuxueli 2016-5-19 17:57:46
  */
+
+/**
+ * 对应于XXL_JOB_QRTZ_TRIGGER_LOGGLUE,用于追踪job执行状态
+ */
 public class XxlJobLogGlue {
 	
 	private int id;

@@ -13,6 +13,10 @@ import java.util.ArrayList;
 /**
  * Created by xuxueli on 17/3/10.
  */
+
+/**
+ * 个人觉得这个方法效率太低了
+ */
 public class ExecutorRouteFailover extends ExecutorRouter {
 
     public String route(int jobId, ArrayList<String> addressList) {
@@ -27,6 +31,7 @@ public class ExecutorRouteFailover extends ExecutorRouter {
             // beat
             ReturnT<String> beatResult = null;
             try {
+                //对每个Executor进行心跳检测
                 ExecutorBiz executorBiz = XxlJobDynamicScheduler.getExecutorBiz(address);
                 beatResult = executorBiz.beat();
             } catch (Exception e) {

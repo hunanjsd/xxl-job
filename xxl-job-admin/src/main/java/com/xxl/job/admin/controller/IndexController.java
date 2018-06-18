@@ -32,6 +32,7 @@ public class IndexController {
 	@Resource
 	private XxlJobService xxlJobService;
 
+	//对应于web主页中job数量，job调度次数，job调度成功次数，job执行期在线数量
 	@RequestMapping("/")
 	public String index(Model model) {
 
@@ -62,6 +63,7 @@ public class IndexController {
 	@PermessionLimit(limit=false)
 	public ReturnT<String> loginDo(HttpServletRequest request, HttpServletResponse response, String userName, String password, String ifRemember){
 		// valid
+		//验证是否登陆了，若已经登陆则直接返回成功
 		if (PermissionInterceptor.ifLogin(request)) {
 			return ReturnT.SUCCESS;
 		}

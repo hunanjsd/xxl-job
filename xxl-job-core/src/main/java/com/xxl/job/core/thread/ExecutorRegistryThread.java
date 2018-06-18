@@ -54,6 +54,7 @@ public class ExecutorRegistryThread extends Thread {
                         RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, executorAddress);
                         for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
                             try {
+                                //通过rpc调用向注册中心注册执行器
                                 ReturnT<String> registryResult = adminBiz.registry(registryParam);
                                 if (registryResult!=null && ReturnT.SUCCESS_CODE == registryResult.getCode()) {
                                     registryResult = ReturnT.SUCCESS;
@@ -77,7 +78,7 @@ public class ExecutorRegistryThread extends Thread {
                         logger.error(e.getMessage(), e);
                     }
                 }
-
+                //结束的时候从注册中心删除执行器
                 // registry remove
                 try {
                     RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appName, executorAddress);

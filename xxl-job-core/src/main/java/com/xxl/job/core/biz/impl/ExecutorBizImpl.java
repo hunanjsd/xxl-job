@@ -21,14 +21,17 @@ import java.util.Date;
 /**
  * Created by xuxueli on 17/3/1.
  */
+//执行器使用的ExecutorBiz(ps:rpc调用类)
 public class ExecutorBizImpl implements ExecutorBiz {
     private static Logger logger = LoggerFactory.getLogger(ExecutorBizImpl.class);
 
+    //为什么这个方法直接返回SUCCESS?呃呃....这是回应xxl-job-admin的RPC心跳
     @Override
     public ReturnT<String> beat() {
         return ReturnT.SUCCESS;
     }
 
+    //检测这个执行器是否在执行指定jobid的任务
     @Override
     public ReturnT<String> idleBeat(int jobId) {
 
@@ -66,21 +69,30 @@ public class ExecutorBizImpl implements ExecutorBiz {
         return new ReturnT<LogResult>(logResult);
     }
 
+    /**
+     * 触发job任务
+     * @param triggerParam
+     * @return
+     */
     @Override
     public ReturnT<String> run(TriggerParam triggerParam) {
         // load old：jobHandler + jobThread
+        //根据jobId从job repository获取jobThread执行线程
         JobThread jobThread = XxlJobExecutor.loadJobThread(triggerParam.getJobId());
         IJobHandler jobHandler = jobThread!=null?jobThread.getHandler():null;
         String removeOldReason = null;
 
         // valid：jobHandler + jobThread
         GlueTypeEnum glueTypeEnum = GlueTypeEnum.match(triggerParam.getGlueType());
+        //处理GlUE类型为BEAN的情况
         if (GlueTypeEnum.BEAN == glueTypeEnum) {
 
             // new jobhandler
+            //获取自己编写xxl-job-executor执行类
             IJobHandler newJobHandler = XxlJobExecutor.loadJobHandler(triggerParam.getExecutorHandler());
 
             // valid old jobThread
+            //xxl-job-admin传递过来的jobHandle和本地存储的jobHandle不同
             if (jobThread!=null && jobHandler != newJobHandler) {
                 // change handler, need kill old thread
                 removeOldReason = "更换JobHandler或更换任务模式,终止旧任务线程";
@@ -143,14 +155,17 @@ public class ExecutorBizImpl implements ExecutorBiz {
 
         // executor block strategy
         if (jobThread != null) {
+            //job 执行时的阻塞处理策略
             ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(triggerParam.getExecutorBlockStrategy(), null);
             if (ExecutorBlockStrategyEnum.DISCARD_LATER == blockStrategy) {
                 // discard when running
+                //当前有正在运行的指定jobid的作业，最新调度的作业放弃运行
                 if (jobThread.isRunningOrHasQueue()) {
                     return new ReturnT<String>(ReturnT.FAIL_CODE, "阻塞处理策略-生效："+ExecutorBlockStrategyEnum.DISCARD_LATER.getTitle());
                 }
             } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
                 // kill running jobThread
+                //覆盖当前正在运行的指定jobId的作业
                 if (jobThread.isRunningOrHasQueue()) {
                     removeOldReason = "阻塞处理策略-生效：" + ExecutorBlockStrategyEnum.COVER_EARLY.getTitle();
 

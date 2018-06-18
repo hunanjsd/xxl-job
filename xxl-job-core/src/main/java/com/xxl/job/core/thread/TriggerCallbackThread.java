@@ -17,6 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Created by xuxueli on 16/7/22.
  */
+//用于向调度中心反馈job调度结果
 public class TriggerCallbackThread {
     private static Logger logger = LoggerFactory.getLogger(TriggerCallbackThread.class);
 

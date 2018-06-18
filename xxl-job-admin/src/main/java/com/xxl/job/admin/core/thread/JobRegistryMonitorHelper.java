@@ -29,6 +29,7 @@ public class JobRegistryMonitorHelper {
 
 	private Thread registryThread;
 	private volatile boolean toStop = false;
+	//这是个守护线程，一直监控Job的注册
 	public void start(){
 		registryThread = new Thread(new Runnable() {
 			@Override
@@ -36,6 +37,7 @@ public class JobRegistryMonitorHelper {
 				while (!toStop) {
 					try {
 						// auto registry group
+						//获取自动注册的jobGroup
 						List<XxlJobGroup> groupList = XxlJobDynamicScheduler.xxlJobGroupDao.findByAddressType(0);
 						if (CollectionUtils.isNotEmpty(groupList)) {
 

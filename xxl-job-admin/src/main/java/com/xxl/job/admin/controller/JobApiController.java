@@ -47,6 +47,7 @@ public class JobApiController {
         }
     }
 
+    //xxl-job-admin开放给executor通过http进行RPC调用的API接口
     @RequestMapping(AdminBiz.MAPPING)
     @PermessionLimit(limit=false)
     public void api(HttpServletRequest request, HttpServletResponse response) throws IOException {

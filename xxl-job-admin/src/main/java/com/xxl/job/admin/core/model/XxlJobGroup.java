@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Created by xuxueli on 16/9/30.
  */
+//对应于数据库中XXL-JOB-QRTZ-TRIGGER-GROUP表
 public class XxlJobGroup {
 
     private int id;

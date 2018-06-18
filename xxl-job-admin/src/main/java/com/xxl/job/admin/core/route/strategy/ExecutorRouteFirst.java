@@ -20,6 +20,7 @@ public class ExecutorRouteFirst extends ExecutorRouter {
     public ReturnT<String> routeRun(TriggerParam triggerParam, ArrayList<String> addressList) {
 
         // address
+        //从addressList中获取最开始的一个执行器ip地址
         String address = route(triggerParam.getJobId(), addressList);
 
         // run executor

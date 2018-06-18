@@ -10,6 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by xuxueli on 17/3/10.
  */
+//job执行路由策略抽象类
 public abstract class ExecutorRouter {
     protected static Logger logger = LoggerFactory.getLogger(ExecutorRouter.class);
 

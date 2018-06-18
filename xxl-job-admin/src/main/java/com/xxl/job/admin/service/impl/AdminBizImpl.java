@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * @author xuxueli 2017-07-27 21:54:20
  */
+//这个Service可以被Rpc远程调用
 @Service
 public class AdminBizImpl implements AdminBiz {
     private static Logger logger = LoggerFactory.getLogger(AdminBizImpl.class);
@@ -39,6 +40,7 @@ public class AdminBizImpl implements AdminBiz {
     private XxlJobService xxlJobService;
 
 
+    //Rpc调用回调函数
     @Override
     public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
         for (HandleCallbackParam handleCallbackParam: callbackParamList) {
@@ -56,6 +58,7 @@ public class AdminBizImpl implements AdminBiz {
         if (log == null) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
         }
+        //调度成功的任务不进行第二次调度
         if (log.getHandleCode() > 0) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "log repeate callback.");     // avoid repeat callback, trigger child job etc
         }
@@ -68,9 +71,11 @@ public class AdminBizImpl implements AdminBiz {
                 callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_child_run") +"<<<<<<<<<<< </span><br>";
 
                 String[] childJobIds = xxlJobInfo.getChildJobId().split(",");
+                //若该任务有子任务时调度子任务
                 for (int i = 0; i < childJobIds.length; i++) {
                     int childJobId = (StringUtils.isNotBlank(childJobIds[i]) && StringUtils.isNumeric(childJobIds[i]))?Integer.valueOf(childJobIds[i]):-1;
                     if (childJobId > 0) {
+                        //交由动态调度器XxlJobDynamicScheduler调度这个任务
                         ReturnT<String> triggerChildResult = xxlJobService.triggerJob(childJobId);
 
                         // add msg
@@ -90,6 +95,7 @@ public class AdminBizImpl implements AdminBiz {
 
             }
         } else if (IJobHandler.FAIL_RETRY.getCode() == handleCallbackParam.getExecuteResult().getCode()){
+            //对于调度失败的任务，若失败处理策略为重试，则进行第二次调度
             ReturnT<String> retryTriggerResult = xxlJobService.triggerJob(log.getJobId());
             callbackMsg = "<br><br><span style=\"color:#F39C12;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_exe_fail_retry") +"<<<<<<<<<<< </span><br>";
 
@@ -118,6 +124,7 @@ public class AdminBizImpl implements AdminBiz {
         return ReturnT.SUCCESS;
     }
 
+    //调度器在xxl-job-admin中进行注册
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
         int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());

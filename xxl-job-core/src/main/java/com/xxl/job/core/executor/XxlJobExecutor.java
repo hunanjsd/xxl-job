@@ -29,12 +29,16 @@ public class XxlJobExecutor implements ApplicationContextAware {
     private static final Logger logger = LoggerFactory.getLogger(XxlJobExecutor.class);
 
     // ---------------------- param ----------------------
+    //xxl-job-admin注册中心地址
     private String adminAddresses;
+    //向注册中心注册时的名字
     private String appName;
     private String ip;
     private int port;
     private String accessToken;
+    //日志路径
     private String logPath;
+    //日志保留时间
     private int logRetentionDays;
 
     public void setAdminAddresses(String adminAddresses) {
@@ -105,12 +109,15 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
 
     // ---------------------- admin-client ----------------------
+    //初始化xxl-job-admin调度中心连接
     private static List<AdminBiz> adminBizList;
     private static void initAdminBizList(String adminAddresses, String accessToken) throws Exception {
         if (adminAddresses!=null && adminAddresses.trim().length()>0) {
             for (String address: adminAddresses.trim().split(",")) {
                 if (address!=null && address.trim().length()>0) {
                     String addressUrl = address.concat(AdminBiz.MAPPING);
+                    //为这个Executor create 新的调度中心连接，因为调度中心可以使用集群模式，所以可能有多个
+                    //获取于调度中心进行rpc通信的类
                     AdminBiz adminBiz = (AdminBiz) new NetComClientProxy(AdminBiz.class, addressUrl, accessToken).getObject();
                     if (adminBizList == null) {
                         adminBizList = new ArrayList<AdminBiz>();
@@ -127,11 +134,14 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
     // ---------------------- executor-server(jetty) ----------------------
     private NetComServerFactory serverFactory = new NetComServerFactory();
+    //初始化执行器客户端，用于执行调度中心分发的任务
     private void initExecutorServer(int port, String ip, String appName, String accessToken) throws Exception {
         // valid param
+        //端口默认写死了为:9999(ps:休想改)
         port = port>0?port: NetUtil.findAvailablePort(9999);
 
         // start server
+        //开启服务器端通信
         NetComServerFactory.putService(ExecutorBiz.class, new ExecutorBizImpl());   // rpc-service, base on jetty
         NetComServerFactory.setAccessToken(accessToken);
         serverFactory.start(port, ip, appName); // jetty + registry
@@ -142,6 +152,7 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
 
     // ---------------------- job handler repository ----------------------
+    //本地客户端注册的hobHandler
     private static ConcurrentHashMap<String, IJobHandler> jobHandlerRepository = new ConcurrentHashMap<String, IJobHandler>();
     public static IJobHandler registJobHandler(String name, IJobHandler jobHandler){
         logger.info(">>>>>>>>>>> xxl-job register jobhandler success, name:{}, jobHandler:{}", name, jobHandler);
@@ -150,6 +161,7 @@ public class XxlJobExecutor implements ApplicationContextAware {
     public static IJobHandler loadJobHandler(String name){
         return jobHandlerRepository.get(name);
     }
+    //获取Bean中使用Jobhandle类注解的类
     private static void initJobHandlerRepository(ApplicationContext applicationContext){
         if (applicationContext == null) {
             return;
@@ -166,17 +178,20 @@ public class XxlJobExecutor implements ApplicationContextAware {
                     if (loadJobHandler(name) != null) {
                         throw new RuntimeException("xxl-job jobhandler naming conflicts.");
                     }
+                    //注册到jobHandlerRepository
                     registJobHandler(name, handler);
                 }
             }
         }
     }
 
-
+    //留意这个方法是在什么时候被调用的(ps:一直没看到它被调用)；在XxlJobExecutor中被调用，用于启动job执行线程
     // ---------------------- job thread repository ----------------------
     private static ConcurrentHashMap<Integer, JobThread> JobThreadRepository = new ConcurrentHashMap<Integer, JobThread>();
     public static JobThread registJobThread(int jobId, IJobHandler handler, String removeOldReason){
+        //任务是在执行器中是异步调度的
         JobThread newJobThread = new JobThread(jobId, handler);
+        //启动任务执行线程
         newJobThread.start();
         logger.info(">>>>>>>>>>> xxl-job regist JobThread success, jobId:{}, handler:{}", new Object[]{jobId, handler});
 

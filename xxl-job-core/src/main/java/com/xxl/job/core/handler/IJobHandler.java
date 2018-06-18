@@ -25,6 +25,7 @@ public abstract class IJobHandler {
 	 * @return
 	 * @throws Exception
 	 */
+	//集成IJobHandler时必须实现的方法
 	public abstract ReturnT<String> execute(String param) throws Exception;
 
 
