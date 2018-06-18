@@ -106,6 +106,7 @@ public class TriggerCallbackThread {
      * do callback, will retry if error
      * @param callbackParamList
      */
+    //job执行完后向调度中心发送执行结果(ps:没有进行负载均衡，优先向第一个负载中心发送)
     private void doCallback(List<HandleCallbackParam> callbackParamList){
         // callback, will retry if error
         for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
